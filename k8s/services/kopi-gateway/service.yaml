@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kopi-gateway
+  namespace: kopi
+  labels:
+    app: kopi-gateway
+    app.kubernetes.io/part-of: kopi-tools
+spec:
+  selector:
+    app: kopi-gateway
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort

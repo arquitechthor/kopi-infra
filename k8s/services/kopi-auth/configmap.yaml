@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopi-auth-config
+  namespace: kopi
+  labels:
+    app: kopi-auth
+    app.kubernetes.io/part-of: kopi-tools
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/kopi_auth"
+  SERVER_PORT: "8081"
+  JWT_EXPIRATION: "86400000"
+  JPA_DDL_AUTO: "update"

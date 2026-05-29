@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopi-links-config
+  namespace: kopi
+  labels:
+    app: kopi-links
+    app.kubernetes.io/part-of: kopi-tools
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/kopi_links"
+  SERVER_PORT: "8082"
+  JPA_DDL_AUTO: "update"

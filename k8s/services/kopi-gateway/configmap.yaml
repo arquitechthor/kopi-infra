@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopi-gateway-config
+  namespace: kopi
+  labels:
+    app: kopi-gateway
+    app.kubernetes.io/part-of: kopi-tools
+data:
+  AUTH_SERVICE_URL: "http://kopi-auth:8081"
+  LINKS_SERVICE_URL: "http://kopi-links:8082"
+  TASKS_SERVICE_URL: "http://kopi-tasks:8083"
+  SERVER_PORT: "8080"

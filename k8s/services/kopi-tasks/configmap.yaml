@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopi-tasks-config
+  namespace: kopi
+  labels:
+    app: kopi-tasks
+    app.kubernetes.io/part-of: kopi-tools
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/kopi_tasks"
+  SERVER_PORT: "8083"
+  JPA_DDL_AUTO: "update"

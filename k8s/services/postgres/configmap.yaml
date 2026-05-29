@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: kopi
+  labels:
+    app: postgres
+data:
+  init-multiple-dbs.sh: |
+    #!/bin/bash
+    set -e
+    if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
+      for db in $(echo "$POSTGRES_MULTIPLE_DATABASES" | tr ',' ' '); do
+        psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+          SELECT 'CREATE DATABASE $db'
+          WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$db')\gexec
+    EOSQL
+        echo "Database '$db' ready."
+      done
+    fi

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kopi-tasks
+  namespace: kopi
+  labels:
+    app: kopi-tasks
+    app.kubernetes.io/part-of: kopi-tools
+spec:
+  selector:
+    app: kopi-tasks
+  ports:
+    - port: 8083
+      targetPort: 8083
+  type: ClusterIP

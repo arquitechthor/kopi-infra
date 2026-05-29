@@ -1,0 +1,31 @@
+# ── Environment files — never commit ──────────────────────────────────────
+.env
+.env.local
+.env.*.local
+docker/compose/.env
+
+# ── Kubernetes secrets with real values — use secrets.example.yaml as base ─
+k8s/base/secrets/secrets.yaml
+
+# ── Legacy structure at root (superseded by docker/compose/) ──────────────
+# Anchored to root with / so docker/compose/docker-compose.yml is NOT excluded
+/docker-compose.yml
+/postgres/
+/k8s/kopi-auth/
+/k8s/kopi-links/
+/k8s/kopi-tasks/
+/k8s/kopi-gateway/
+/k8s/postgres/
+/k8s/namespace.yaml
+/k8s/ingress.yaml
+/k8s/deploy.sh
+/k8s/secrets/
+
+# ── OS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml

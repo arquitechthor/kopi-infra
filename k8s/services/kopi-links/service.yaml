@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kopi-links
+  namespace: kopi
+  labels:
+    app: kopi-links
+    app.kubernetes.io/part-of: kopi-tools
+spec:
+  selector:
+    app: kopi-links
+  ports:
+    - port: 8082
+      targetPort: 8082
+  type: ClusterIP

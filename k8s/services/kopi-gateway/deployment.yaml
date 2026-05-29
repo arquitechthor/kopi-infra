@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kopi-gateway
+  namespace: kopi
+  labels:
+    app: kopi-gateway
+    app.kubernetes.io/part-of: kopi-tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kopi-gateway
+  template:
+    metadata:
+      labels:
+        app: kopi-gateway
+    spec:
+      containers:
+        - name: kopi-gateway
+          image: kopi-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: kopi-gateway-config
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"

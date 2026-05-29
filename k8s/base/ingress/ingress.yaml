@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kopi-ingress
+  namespace: kopi
+  labels:
+    app.kubernetes.io/part-of: kopi-tools
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # CORS is handled by Spring Cloud Gateway — not duplicated here
+spec:
+  ingressClassName: nginx
+  # TLS: uncomment for production (cert-manager or ACM)
+  # tls:
+  #   - hosts:
+  #       - kopi.yourdomain.com
+  #     secretName: kopi-tls
+  rules:
+    - host: kopi.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kopi-gateway
+                port:
+                  number: 8080

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopi-global-config
+  namespace: kopi
+  labels:
+    app.kubernetes.io/part-of: kopi-tools
+data:
+  # Shared configuration for all kopi microservices
+  JPA_DDL_AUTO: "update"
+  JWT_EXPIRATION: "86400000"

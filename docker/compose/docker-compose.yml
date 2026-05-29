@@ -1,0 +1,142 @@
+services:
+
+  # ── Database ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: kopi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kopi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kopi_pass}
+      POSTGRES_MULTIPLE_DATABASES: kopi_auth,kopi_links,kopi_tasks
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kopi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Auth microservice ──────────────────────────────────────────────────────
+  kopi-auth:
+    build:
+      context: ../../../kopi-auth-bk
+      dockerfile: Dockerfile
+    container_name: kopi-auth
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kopi_auth
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kopi}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kopi_pass}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ── Links microservice ─────────────────────────────────────────────────────
+  kopi-links:
+    build:
+      context: ../../../kopi-links-bk
+      dockerfile: Dockerfile
+    container_name: kopi-links
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kopi_links
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kopi}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kopi_pass}
+      JWT_SECRET: ${JWT_SECRET}
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ── Tasks microservice ─────────────────────────────────────────────────────
+  kopi-tasks:
+    build:
+      context: ../../../kopi-tasks-bk
+      dockerfile: Dockerfile
+    container_name: kopi-tasks
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kopi_tasks
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kopi}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kopi_pass}
+      JWT_SECRET: ${JWT_SECRET}
+      SERVER_PORT: 8083
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ── API Gateway ────────────────────────────────────────────────────────────
+  kopi-gateway:
+    build:
+      context: ../../../kopi-gateway
+      dockerfile: Dockerfile
+    container_name: kopi-gateway
+    restart: unless-stopped
+    environment:
+      AUTH_SERVICE_URL: http://kopi-auth:8081
+      LINKS_SERVICE_URL: http://kopi-links:8082
+      TASKS_SERVICE_URL: http://kopi-tasks:8083
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      kopi-auth:
+        condition: service_healthy
+      kopi-links:
+        condition: service_healthy
+      kopi-tasks:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ── Frontend ───────────────────────────────────────────────────────────────
+  kopi-ui:
+    build:
+      context: ../../../kopi-tools-ui
+      dockerfile: Dockerfile
+    container_name: kopi-ui
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      kopi-gateway:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+    name: kopi-postgres-data

@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base/namespaces/kopi-apps.yaml
+  - ../../base/ingress/ingress.yaml
+  - ../../base/config/global-configmap.yaml
+  - ../../base/rbac/service-accounts.yaml
+  - ../../services/postgres/pvc.yaml
+  - ../../services/postgres/configmap.yaml
+  - ../../services/postgres/deployment.yaml
+  - ../../services/postgres/service.yaml
+  - ../../services/kopi-auth/configmap.yaml
+  - ../../services/kopi-auth/deployment.yaml
+  - ../../services/kopi-auth/service.yaml
+  - ../../services/kopi-links/configmap.yaml
+  - ../../services/kopi-links/deployment.yaml
+  - ../../services/kopi-links/service.yaml
+  - ../../services/kopi-tasks/configmap.yaml
+  - ../../services/kopi-tasks/deployment.yaml
+  - ../../services/kopi-tasks/service.yaml
+  - ../../services/kopi-gateway/configmap.yaml
+  - ../../services/kopi-gateway/deployment.yaml
+  - ../../services/kopi-gateway/service.yaml
